@@ -15,9 +15,18 @@ def insertion_sort(sequence):
     Returns:
         list: De gesorteerde lijst.
     """
-    # TODO: implementeer insertion sort
-    pass
-
+    if len(sequence) < 2:
+        return sequence
+    index = 1
+    while index < len(sequence):
+        temp_index = index
+        while temp_index > 0 and sequence[temp_index] < sequence[temp_index - 1]:
+            memory = sequence[temp_index -1]
+            sequence[temp_index - 1] = sequence[temp_index]
+            sequence[temp_index] = memory
+            temp_index -= 1
+        index += 1
+    return sequence
 
 if __name__ == "__main__":
     # Test je implementatie met deze voorbeelden

@@ -76,13 +76,39 @@ class Path:
         node_names = [n.State.Name for n in self.Nodes]
         return "->".join(node_names) + "=" + str(self.Cost)
 
+    def __gt__(self, other):
+        if len(self.Nodes) != len(other.Nodes):
+            return len(self.Nodes) > len(other.Nodes)
+        return False
 
-def dijkstra(problem):
-    # TODO: implementeer Dijkstra met een priority queue (heapq)
-    pass
 
+def dijkstra(problem:Problem):
+    start = problem.InitialState
+    goal = problem.GoalState
+    h = []
+    initial_path = Path(start)
+    heapq.heappush(h, (0, initial_path))
+    visited = set()
+ 
+    while len(h) > 0:
+        cost_path = heapq.heappop(h)
+        node:Node = cost_path[1].LeafNode
+        if node in visited:
+            continue
+        if node == goal:
+            return cost_path[1]
+        visited.add(node)
 
-# Maak een testgraafbestand aan
+        for edge in node.Actions:
+            if edge.ToNode not in visited:
+                copy = Path(start)
+                copy.Nodes = cost_path[1].Nodes + [edge.ToNode]
+                copy.LeafNode = edge.ToNode
+                copy.Cost = cost_path[1].Cost + edge.Cost
+                heapq.heappush(h, (copy.Cost, copy))
+ 
+    return None
+
 test_data = """A
 H
 A: B 2 C 3

@@ -46,6 +46,7 @@ class FaultTolerantAgent:
 
     def __init__(self):
         # TODO: interne state — welke variabelen heb je nodig?
+<<<<<<< Updated upstream
         self.previous_value = None
         self.suspected_sensor = None
 
@@ -53,6 +54,14 @@ class FaultTolerantAgent:
         """Sensors: geef beide metingen terug."""
         # TODO
         return (p.sensor_a, p.sensor_b)
+=======
+        self.prev = None
+
+    def read_all(self, p: Reading) -> tuple[float, float]:
+        """Sensors: geef beide metingen terug."""
+        sensors = p.sensor_a, p.sensor_b
+        return sensors
+>>>>>>> Stashed changes
 
     def reliable_value(self, a: float, b: float, previous: Optional[float]) -> float:
         """Sensor model: bepaal de meest betrouwbare hoogtemeting.
@@ -65,6 +74,18 @@ class FaultTolerantAgent:
           bij voorkeur sensor a.
         """
         # TODO: implementeer dit 
+        if abs(a - b) < self.TOLERANCE:
+            return (a + b) / 2
+        if self.prev == None:
+            return a
+        
+        verschilA = abs(previous - a)
+        verschilB = abs(previous - b)
+
+        if verschilA < verschilB:
+            return a
+        return b
+
 
         if abs(a - b) < self.TOLERANCE : 
             # betrouwbaar
@@ -86,6 +107,7 @@ class FaultTolerantAgent:
         #       de vorige waarde) en vraag correctie aan als de daling
         #       sneller is dan DESCENT_LIMIT. Vergeet de interne state
         #       niet bij te werken.
+<<<<<<< Updated upstream
         a,b = self.read_all()
         reliable_value = self.reliable_value(a,b)
 
@@ -96,6 +118,14 @@ class FaultTolerantAgent:
 
         delta = reliable_value - self.previous_value # bij daling wil je een negatief getal
         self.previous_value = reliable_value
+=======
+        a, b = self.read_all(p)
+        alt = self.reliable_value(a, b, self.prev)
+        if self.prev == None:
+            self.prev = alt
+        delta = alt - self.prev
+        self.prev = alt
+>>>>>>> Stashed changes
         if delta < self.DESCENT_LIMIT:
             return Correct()
         return Nothing()

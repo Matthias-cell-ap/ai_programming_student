@@ -42,24 +42,73 @@ class RouteAgent:
 
     def utility(self, from_city: str, to_city: str) -> float:
         """TODO: geef -d(from_city, to_city) terug."""
-        return 0.0
+        dist = distance(from_city, to_city)
+        if dist != None:
+            return 0 - dist
+        return dist
 
     def neighbours(self, city: str) -> list[str]:
         """TODO: geef alle steden met een directe weg naar `city`."""
-        return []
+        neighbours = [ab for ab in CITIES if distance(city, ab) != None] 
+        return neighbours
 
     def choose_next(self, current_city: str, visited: set[str]) -> Optional[str]:
         """TODO: kies onder de niet-bezochte buren de buur met de
         hoogste utility. Geen buren meer? -> None.
         """
+        valid = [b for b in self.neighbours(current_city) if b not in visited]
+        if len(valid) > 0:
+            return max(valid, key=lambda to_city: self.utility(current_city, to_city))
         return None
 
-    def plan_route(self, start_city: str, goal_city: str) -> list[str]:
-        """TODO: bouw de route stad per stad via choose_next.
-
+    """def plan_route(self, start_city: str, goal_city: str) -> list[str]:
+        ""TODO: bouw de route stad per stad via choose_next.
         Stop zodra de goal bereikt is of de agent vastzit.
-        """
-        return [start_city]
+        ""
+        current = start_city
+        route = [current]
+        visited = {current}
+
+        while current != goal_city:
+            next_city = self.choose_next(current, visited)
+
+            if next_city is None:
+                break
+
+            route.append(next_city)
+            visited.add(next_city)
+            current = next_city
+
+        return route"""
+    
+    def plan_route(self,start_city: str,goal_city: str,history: Optional[list[str]] = None,visited: Optional[set[str]] = None,) -> list[str]:
+
+        if history is None:
+            history = [start_city]
+        if visited is None:
+            visited = {start_city}
+
+        current = start_city
+
+        if distance(current, goal_city) is not None:
+            history.append(goal_city)
+            return history
+
+        while True:
+            next_city = self.choose_next(current, visited)
+
+            if next_city is None:
+                return None
+
+            visited.add(next_city)
+            history.append(next_city)
+
+            result = self.plan_route(next_city, goal_city, history, visited)
+
+            if result is not None:
+                return result
+
+            history.pop()
 
 
 if __name__ == "__main__":
