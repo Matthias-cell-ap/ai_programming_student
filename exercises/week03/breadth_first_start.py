@@ -22,13 +22,36 @@ class Node:
 
 def breadth_first_search(initial_node, goal_state):
     # TODO: implementeer BFS met een queue
-    # HINT: gebruik parent-tracking om het pad te reconstrueren
-    pass
+    q = deque([initial_node])
+    visited = {initial_node.state}
+    parent = {initial_node: None}
+
+    while q:
+        node = q.popleft()
+
+        if node.state == goal_state:
+            return node, parent
+
+        for action in node.actions:
+            if action.state not in visited:
+                visited.add(action.state)
+                q.append(action)
+                parent[action] = node
+    
+    return False, False
 
 
 def print_path(parent, goal_node):
-    # TODO: print het pad van start naar goal (backward printing)
-    pass
+    node = goal_node
+    path = [node.state.name]
+
+    while parent[node] is not None:
+        path.append(parent[node].state.name)
+        node = parent[node]
+
+    for name in reversed(path):
+        print(name)
+    
 
 
 if __name__ == "__main__":
@@ -56,8 +79,8 @@ if __name__ == "__main__":
     node_c.add_action(node_f)
     node_f.add_action(node_h)
 
-    solution = breadth_first_search(node_a, state_h)
+    solution, parent = breadth_first_search(node_a, state_h)
     if solution:
-        print("Oplossing gevonden! Doel:", solution.state.name)
+        print_path(parent, solution)
     else:
         print("Geen oplossing.")
